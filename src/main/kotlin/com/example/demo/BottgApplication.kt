@@ -1,51 +1,20 @@
 package com.example.demo
 
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.runApplication
-import org.telegram.telegrambots.ApiContextInitializer
+import org.telegram.telegrambots.meta.TelegramBotsApi
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
+import java.lang.IllegalArgumentException
 
+fun main() {
+    val config = BotConfiguration(
+        System.getenv("BOT_NAME") ?: throw IllegalArgumentException("Env variable BOT_NAME is not set"),
+        System.getenv("BOT_TOKEN") ?: throw IllegalArgumentException("Env variable BOT_TOKEN is not set"),
+    )
 
-@SpringBootApplication
-class BottgApplication
-
-fun main(args: Array<String>) {
-	ApiContextInitializer.init()
-	runApplication<BottgApplication>(*args)
+    try {
+        val botsApi = TelegramBotsApi(DefaultBotSession::class.java)
+        botsApi.registerBot(DevmarkBot(config))
+    } catch (e: TelegramApiException) {
+        e.printStackTrace();
+    }
 }
-
-/*@Service
-class TestBot : TelegramLongPollingBot() {
-
-	@Value("\${telegram.botName}")
-	private val botName: String = "UGolSashaTaskBot"
-
-	@Value("\${telegram.token}")
-	private val token: String = "1898533219:AAGHxHrdMfldUtgQzrr2mOMoFIGaAYRNRG"
-
-	override fun getBotUsername(): String = botName
-
-	override fun getBotToken(): String = token
-
-	override fun onUpdateReceived(update: Update) {
-		if (update.hasMessage()) {
-			val message = update.message
-			val chatId = message.chatId
-			val responseText = if (message.hasText()) {
-				val messageText = message.text
-				when {
-					messageText == "/start" -> "Добро пожаловать!"
-					else -> "Вы написали: *$messageText*"
-				}
-			} else {
-				"Я понимаю только текст"
-			}
-			sendNotification(chatId, responseText)
-		}
-	}
-	private fun sendNotification(chatId: Long, responseText: String) {
-		val responseMessage = SendMessage(chatId, responseText)
-		responseMessage.setParseMode("Markdown")
-		execute(responseMessage)
-	}
-
-}*/

@@ -1,25 +1,20 @@
 package com.example.demo
 
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Service
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
 
-@Service
-class DevmarkBot : TelegramLongPollingBot() {
+data class BotConfiguration(
+    val name: String,
+    val token: String,
+)
 
-    @Value("\${telegram.botName}")
-    private val botName: String = "UGolSashaTaskBot"
+class DevmarkBot(val config: BotConfiguration) : TelegramLongPollingBot() {
+    override fun getBotUsername() = config.name
 
-    @Value("\${telegram.token}")
-    private val token: String = "1898533219:AAGHxHrdMfldUtgQzrr2mOMoFIGaAYRNRG"
-
-    override fun getBotUsername(): String = botName
-
-    override fun getBotToken(): String = token
+    override fun getBotToken() = config.token
 
     override fun onUpdateReceived(update: Update) {
         if (update.hasMessage()) {
@@ -41,7 +36,7 @@ class DevmarkBot : TelegramLongPollingBot() {
     }
 
     private fun sendNotification(chatId: Long, responseText: String) {
-        val responseMessage = SendMessage(chatId, responseText)
+        val responseMessage = SendMessage(chatId.toString(), responseText)
         responseMessage.setParseMode("Markdown")
         responseMessage.replyMarkup = getReplyMarkup(
             listOf(

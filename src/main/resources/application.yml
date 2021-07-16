@@ -1,4 +1,0 @@
-telegram:
-  botName: UGolSashaTaskBot
-  token: ${TOKEN}
-
