@@ -1,20 +1,19 @@
 package com.example.demo
 
 import org.telegram.telegrambots.meta.TelegramBotsApi
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
 import java.lang.IllegalArgumentException
 
+fun getEnvVariable(name: String) =
+    System.getenv(name) ?: throw IllegalArgumentException("Env variable $name is not set")
+
+
 fun main() {
     val config = BotConfiguration(
-        System.getenv("BOT_NAME") ?: throw IllegalArgumentException("Env variable BOT_NAME is not set"),
-        System.getenv("BOT_TOKEN") ?: throw IllegalArgumentException("Env variable BOT_TOKEN is not set"),
+        name = getEnvVariable("BOT_NAME"),
+        token = getEnvVariable("BOT_TOKEN")
     )
 
-    try {
-        val botsApi = TelegramBotsApi(DefaultBotSession::class.java)
-        botsApi.registerBot(DevmarkBot(config))
-    } catch (e: TelegramApiException) {
-        e.printStackTrace();
-    }
+    TelegramBotsApi(DefaultBotSession::class.java)
+        .registerBot(DevmarkBot(config))
 }
